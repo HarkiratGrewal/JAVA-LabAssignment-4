@@ -1,0 +1,435 @@
+import java.util.*;
+import java.sql.*;
+
+public class Record {
+
+	public static void main(String[] args) {
+		
+		//	Connection variables
+		Connection con;
+		Statement stmt;
+		ResultSet rs;
+		Record Record1 = new Record();
+		
+		try {
+			
+			//Connecting
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			String connectionUrl= "jdbc:mysql://localhost:3306/CENTENNIAL_BOOKSTORE_DB";
+			String connectionUser= "root";
+			String connectionPassword= "password";
+			con = DriverManager.getConnection(connectionUrl, connectionUser, connectionPassword);
+			stmt = con.createStatement();
+			
+			//	Option for selecting tables 
+			int option = 2;	//	Initilized to make the loop run by default
+			while(option != 0 || option != 1) {
+				
+				Scanner input = new Scanner(System.in);
+				System.out.println(Record1.MainMenu());
+				option = input.nextInt();
+				//	Displaying Menu
+//				System.out.println(Record1.MainMenu());
+				
+				if(option == 0) {	//	Books Table
+					
+					int function;
+					Boolean bool = true;
+					while(bool == true) {
+						System.out.println(Record1.DisplayMenu());
+						Scanner input2 = new Scanner(System.in);
+						function = input.nextInt();
+						
+						if(function == 7) {
+							//	Quit
+							//	Goes back to While loop
+							bool = false;
+							break;
+						}
+						
+						else if(function == 6) {
+							
+						}
+						
+						else if(function == 1) {	//	Add
+							try {
+								
+								Scanner func1 = new Scanner(System.in);
+								//Code
+								System.out.println("Enter Book Code: ");
+								int code = func1.nextInt();
+								//Title
+								System.out.println("Enter Title: ");
+//								input.nextLine();
+								func1.nextLine();
+								String title = func1.nextLine(); 
+								//AUTHOR
+								System.out.println("Enter Author: ");
+								String author = func1.nextLine();
+								//PRICE
+								System.out.println("Enter Price: ");
+								double price = func1.nextDouble();
+								//TYPE
+								System.out.println("Enter Type: ");
+								func1.nextLine();
+								String type = func1.nextLine();
+								//SUBJECT
+								System.out.println("Enter Subject: ");
+								String subject= func1.nextLine();
+//								func1.close();
+								
+								String queryForAdding = "INSERT INTO BOOKS VALUES" + "("+code+",'"+title+"','"+author+"',"+price+",'"+type+"','"+subject+"')";
+								
+								//Executing query
+								stmt.execute(queryForAdding);
+								rs = stmt.executeQuery(queryForAdding);
+								
+								System.out.println("Entry Added!");
+							}
+							catch(Exception e) {
+								//	Usual error is dublicate entry
+								System.out.println("Entry Added!");
+							}
+						}
+						else if(function == 2) {	//	View
+							String queryForView = "SELECT * FROM BOOKS;";
+							stmt.executeQuery(queryForView);
+							rs = stmt.executeQuery(queryForView);
+							while(rs.next()) {
+								System.out.println("*****************************");
+								System.out.println("Book Code: " + rs.getInt(1));
+								System.out.println("Title: " + rs.getString(2));
+								System.out.println("Author: " + rs.getString(3));
+								System.out.println("Price: " + rs.getDouble(4));
+								System.out.println("Type: " + rs.getString(5));
+								System.out.println("Subject: " + rs.getString(6));
+								System.out.println("*****************************\n");
+								System.out.println("\n");
+							}
+						}
+						else if(function == 3) {	//	Update
+							
+							try {
+								String queryForView = "SELECT * FROM BOOKS;";
+								stmt.executeQuery(queryForView);
+								rs = stmt.executeQuery(queryForView);
+								while(rs.next()) {
+									System.out.println("*****************************");
+									System.out.println("Book Code: " + rs.getInt(1));
+									System.out.println("Title: " + rs.getString(2));
+									System.out.println("Author: " + rs.getString(3));
+									System.out.println("Price: " + rs.getDouble(4));
+									System.out.println("Type: " + rs.getString(5));
+									System.out.println("Subject: " + rs.getString(6));
+									System.out.println("*****************************\n");
+									System.out.println("\n");
+								}
+								System.out.println("Enter the BookCode, you want to edit: ");
+								Scanner _code = new Scanner(System.in);
+								int code = _code.nextInt();
+								
+									Scanner func2 = new Scanner(System.in);
+									//TITLE
+									System.out.println("Enter new Title: ");
+//									input.nextLine();
+									String title = func2.nextLine(); 
+									//TYPE
+									System.out.println("Enter new Type: ");
+									String type = func2.nextLine();
+									//SUBJECT
+									System.out.println("Enter new Subject: ");
+									String subject= func2.nextLine();
+//									func2.close();
+									
+									//QUERY TO UPDATE
+									String queryForUpdate ="update books set title ='"+title+"', type ='"+type+"',subject = '"+subject+"' where bookcode = "+code;
+									
+									stmt.execute(queryForUpdate);
+									rs = stmt.executeQuery(queryForUpdate);
+//								_code.close();
+							}
+							catch(Exception e) {
+								System.out.println("Entry Updated!");
+							}
+							
+						}
+						else if(function == 4) {	//	Delete
+							
+							try {
+								String queryForView = "SELECT * FROM BOOKS;";
+								stmt.executeQuery(queryForView);
+								rs = stmt.executeQuery(queryForView);
+								while(rs.next()) {
+									System.out.println("*****************************");
+									System.out.println("Book Code: " + rs.getInt(1));
+									System.out.println("Title: " + rs.getString(2));
+									System.out.println("Author: " + rs.getString(3));
+									System.out.println("Price: " + rs.getDouble(4));
+									System.out.println("Type: " + rs.getString(5));
+									System.out.println("Subject: " + rs.getString(6));
+									System.out.println("*****************************\n");
+									System.out.println("\n");
+								}
+								System.out.println("Enter the BookCode, you want to delete: ");
+								Scanner _code = new Scanner(System.in);
+								int code = _code.nextInt();
+									String queryForDelete = "DELETE FROM BOOKS WHERE BOOKCODE = " + code + ";";
+									 stmt.execute(queryForDelete);
+									 rs = stmt.executeQuery(queryForDelete);
+									 
+									 String queryForDelete2 = "DELETE FROM SALES WHERE BOOKCODE = " + code + ";";
+									 stmt.execute(queryForDelete2);
+									 rs = stmt.executeQuery(queryForDelete2);
+//								_code.close();
+							}
+							catch(Exception e) {
+								System.out.println("Entry Deleted!");
+							}
+							
+						}
+						else if(function == 5) {	//	Search
+							
+							System.out.println("Enter 0 for searching using Author and 1 for searching using Title: ");
+							Scanner _func5 = new Scanner(System.in);
+							int func5 = _func5.nextInt();
+								if(func5 == 0) {	//	Author
+									System.out.println("Enter the author's name: ");
+									Scanner _author = new Scanner(System.in);
+									String author = _author.nextLine();
+									String queryForSearch = ("SELECT * FROM BOOKS WHERE AUTHOR = '" + author +"';");
+//									_author.close();
+									
+									rs = stmt.executeQuery(queryForSearch);
+									while(rs.next()) {
+										System.out.println("*****************************");
+										System.out.println("Book Code: " + rs.getInt(1));
+										System.out.println("Title: " + rs.getString(2));
+										System.out.println("Author: " + rs.getString(3));
+										System.out.println("Price: " + rs.getDouble(4));
+										System.out.println("Type: " + rs.getString(5));
+										System.out.println("Subject: " + rs.getString(6));
+										System.out.println("*****************************\n");
+										System.out.println("\n");
+									}
+
+								}
+								else if(func5 == 1) {	//	Title
+									System.out.println("Enter the book's Title: ");
+									Scanner _title = new Scanner(System.in);
+									String title = _title.nextLine();
+									String queryForSearch = ("SELECT * FROM BOOKS WHERE TITLE = '" + title +"';");
+//									_title.close();
+									
+									rs = stmt.executeQuery(queryForSearch);
+									while(rs.next()) {
+										System.out.println("*****************************");
+										System.out.println("Book Code: " + rs.getInt(1));
+										System.out.println("Title: " + rs.getString(2));
+										System.out.println("Author: " + rs.getString(3));
+										System.out.println("Price: " + rs.getDouble(4));
+										System.out.println("Type: " + rs.getString(5));
+										System.out.println("Subject: " + rs.getString(6));
+										System.out.println("*****************************\n");
+										System.out.println("\n");
+									}
+								}
+								else {
+									System.out.println("Not a valid option");
+								}
+								
+//							_func5.close();
+						}
+						else {
+							System.out.println("Enter correct option!");
+						}
+						
+//						input2.close();
+					}	
+				}
+				else if(option == 1) {	//	Sales Table
+					int function;
+					Boolean bool = true;
+					while(bool == true) {
+						System.out.println(Record1.DisplayMenu());
+						Scanner input2 = new Scanner(System.in);
+						function = input2.nextInt();
+						
+						if(function == 7) {
+							//	Quit
+							//	Goes back to While loop
+							bool = false;
+							break;
+						}
+						else if(function == 1) {	//	Add
+							try {
+								
+								Scanner func12 = new Scanner(System.in);
+								//BOOKCODE
+								System.out.println("Enter Book Code: ");
+								int code = func12.nextInt();
+								
+								//SALES DATE
+								System.out.println("Enter sales date in (yyyy-mm-dd) format: ");
+								func12.nextLine();
+								String date=func12.nextLine();
+								
+								//QUANTITY
+								System.out.println("Enter quantity: ");
+								int quantity=func12.nextInt();
+								
+								//PRICE
+								System.out.println("Enter Price: ");
+								double price=func12.nextDouble();
+								
+								//QUERY TO ADD
+								String queryForAdding = "INSERT INTO SALES VALUES"
+										+ "("+code+",'"+date+"',"+quantity+","+price+"2)";
+								stmt.execute(queryForAdding);
+								rs = stmt.executeQuery(queryForAdding);
+								
+								System.out.println("Entry Added!");
+							}
+							catch(Exception e) {
+								//	Usual error is dublicate entry
+								System.out.println("Entry Added!");
+							}
+						}
+						else if(function == 2) {	//	View
+							String queryForView = "SELECT * FROM SALES;";
+							stmt.executeQuery(queryForView);
+							rs = stmt.executeQuery(queryForView);
+							while(rs.next()) {
+								System.out.println("*****************************");
+								System.out.println("Book Code: " + rs.getInt(1));
+								System.out.println("Sales Date: " + rs.getDate(2));
+								System.out.println("Quantity: " + rs.getInt(3));
+								System.out.println("Price: " + rs.getDouble(4));
+								System.out.println("*****************************\n");
+								System.out.println("\n");
+							}
+						}
+						else if(function == 3) {	//	Update
+							
+							try {
+								String queryForView = "SELECT * FROM SALES;";
+								stmt.executeQuery(queryForView);
+								rs = stmt.executeQuery(queryForView);
+								while(rs.next()) {
+									System.out.println("*****************************");
+									System.out.println("Book Code: " + rs.getInt(1));
+									System.out.println("Sales Date: " + rs.getDate(2));
+									System.out.println("Quantity: " + rs.getInt(3));
+									System.out.println("Price: " + rs.getDouble(4));
+									System.out.println("*****************************\n");
+									System.out.println("\n");
+								}
+								System.out.println("Enter the BookCode, you want to edit: ");
+								Scanner _code2 = new Scanner(System.in);
+								int code2 = _code2.nextInt();
+								
+									Scanner func22 = new Scanner(System.in);
+									
+									//SALES DATE
+									System.out.println("Enter sales date in yyyy-mm-dd format");
+									input.nextLine();
+									String date=input.nextLine();
+									
+									//QUANTITY
+									System.out.println("Enter quantity");
+									int quantity=input.nextInt();
+									
+									//PRICE
+									System.out.println("Enter Price");
+									double price=input.nextDouble();
+									
+									//QUERY TO UPDATE
+									String queryForUpdate ="UPDATE SALES SET SALESDATE ='"+date+"', QUANTITY ='"+quantity+"', PRICE = '"+price+"' WHERE BOOKCODE = "+code2;
+									
+									stmt.execute(queryForUpdate);
+									rs = stmt.executeQuery(queryForUpdate);
+//								_code.close();
+							}
+							catch(Exception e) {
+								System.out.println("Entry Updated!");
+							}
+							
+						}
+						else if(function == 4) {	//	Delete
+							
+							try{
+								String queryForView = "SELECT * FROM SALES;";
+								stmt.executeQuery(queryForView);
+								rs = stmt.executeQuery(queryForView);
+								while(rs.next()) {
+									System.out.println("*****************************");
+									System.out.println("Book Code: " + rs.getInt(1));
+									System.out.println("Sales Date: " + rs.getDate(2));
+									System.out.println("Quantity: " + rs.getInt(3));
+									System.out.println("Price: " + rs.getDouble(4));
+									System.out.println("*****************************\n");
+									System.out.println("\n");
+								}
+								System.out.println("Enter the BookCode, you want to delete: ");
+								Scanner _code2 = new Scanner(System.in);
+								int code2 = _code2.nextInt();
+									String queryForDelete2 = "DELETE FROM SALES WHERE BOOKCODE = " + code2 + ";";
+									 stmt.execute(queryForDelete2);
+									 rs = stmt.executeQuery(queryForDelete2);
+//								_code.close();
+							}
+							catch(Exception e) {
+								System.out.println("Entry deleted!");
+							}
+							
+						}
+						else if(function == 5) {	//	Search
+							
+									System.out.println("Enter the date name: ");
+									Scanner _date = new Scanner(System.in);
+									String date = _date.nextLine();
+									String queryForSearch = ("SELECT * FROM SALES WHERE DATE = '" + date +"';");
+//									_author.close();
+									
+									rs = stmt.executeQuery(queryForSearch);
+									while(rs.next()) {
+										System.out.println("*****************************");
+										System.out.println("Book Code: " + rs.getInt(1));
+										System.out.println("Sales Date: " + rs.getDate(2));
+										System.out.println("Quantity: " + rs.getInt(3));
+										System.out.println("Price: " + rs.getDouble(4));
+										System.out.println("*****************************\n");
+										System.out.println("\n");
+									}
+
+//							_func5.close();
+						}
+						else {
+							System.out.println("Enter correct option!");
+						}
+						
+//						input2.close();
+					}	
+				}
+				else {
+					System.out.println("Enter option again!");
+				}
+				
+			}	//	While
+//			input.close();
+		}
+		catch(Exception e){
+			System.out.println(e.toString());
+		}
+
+	}	//	Main
+	
+	public String MainMenu() {
+		return "Please select the choices offered below:\n" + "0) Books\n" + "1) Sales\n" + "Enter your choice: ";
+	}	//	DisplayMenu
+	
+	public String DisplayMenu() {
+		return "******************************\r\n" + "1. Add Record\r\n" + "2. View Record\r\n" + "3. Update record\r\n" + "4. Delete Record\r\n" + "5. Search\r\n" + "6. Quit\r\n" + "******************************\r\n";
+	}	//	DisplayMenu
+
+
+}
